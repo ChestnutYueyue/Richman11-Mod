@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using DeJson;
 using System;
+using System.Linq;
 
 namespace MonopolyCardModifier;
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
@@ -16,13 +17,13 @@ public class CardTexPlugin : BaseUnityPlugin
     public StringBuilder stringBuilder = new();
     private Rect rect = new(50, 50, 500, 650);
     private Vector2 scrollViewVector;
-    bool Cardflag = false;
+    private int Cardflag = 0;
     bool showWindow = false;
     static bool buttonflag = false;
     static bool Moneybuttonflag = false;
     static bool Assistantbuttonflag = false;
-    public static string stringArray = "7,13";
-    public static string MoneystringArray = "0";
+    public static string stringArray = "7,1,35,40,43,45,42,26";
+    public static string MoneystringArray = "999999";
     void Start()
     {
         toggleKey = Config.Bind("General", "Toggle Key", KeyCode.F1, "切换窗口的键");
@@ -34,10 +35,10 @@ public class CardTexPlugin : BaseUnityPlugin
         {
             showWindow = !showWindow;
         }
-        if (uLoading.Instance.iShowStep >= 10 && Cardflag == false)
+        if (uLoading.Instance.iShowStep >= 10 && Cardflag == 0)
         {
             GetCardTex();
-            Cardflag = true;
+            Cardflag++;
         }
 
     }
@@ -99,7 +100,7 @@ public class CardTexPlugin : BaseUnityPlugin
     public void GetCardTex()
     {
         var cardTex = Traverse.Create(typeof(DataManager)).Field("baseCard").GetValue<BaseCardMgr>();
-        if (cardTex != null && Cardflag == false)
+        if (cardTex != null)
         {
             foreach (KeyValuePair<int, BaseCardData> key in cardTex.card)
             {
@@ -107,7 +108,7 @@ public class CardTexPlugin : BaseUnityPlugin
             }
         }
     }
-    [HarmonyPrefix, HarmonyPatch(typeof(BattleBaseInfo), "DelCard", [typeof(int)])]
+    [HarmonyPrefix, HarmonyPatch(typeof(BattleBaseInfo), "DelCard")]
     public static bool BattleBaseInfoDelCard(ref BattleBaseInfo __instance)
     {
         // 锁定卡片
@@ -120,24 +121,31 @@ public class CardTexPlugin : BaseUnityPlugin
                 '；',
                 ';'
         ]);
+        // 限制输入
+        if (array.Length > 9)
+        {
+            array = array.Take(9).ToArray();
+        }
         if (__instance.GetName() == "我" && __instance.iOrder == 0 && buttonflag == true)
         {
+            __instance.pNowCardBagList.Clear();
             for (int i = 0; i < array.Length; i++)
             {
                 if (int.TryParse(array[i], out int key))
                 {
-                    __instance.pNowCardBagList[i] = key;
+                    __instance.pNowCardBagList.Add(key);
                 }
             }
             return false;
         }
-        else if (__instance.iOrder == 1 && buttonflag == true)
+        else if (__instance.GetName() == "我" && __instance.iOrder == 1 && buttonflag == true)
         {
+            __instance.pNowCardBagList.Clear();
             for (int i = 0; i < array.Length; i++)
             {
                 if (int.TryParse(array[i], out int key))
                 {
-                    __instance.pNowCardBagList[i] = key;
+                    __instance.pNowCardBagList.Add(key);
                 }
             }
             return false;
@@ -145,42 +153,30 @@ public class CardTexPlugin : BaseUnityPlugin
         return true;
     }
     [HarmonyPrefix, HarmonyPatch(typeof(BattleBaseInfo), "ChangeMoney2")]
-    public static bool BattleBaseInfo_ChangeMoney2(ref BattleBaseInfo __instance, ref int money)
+    public static bool BattleBaseInfo_ChangeMoney2Prefix(BattleBaseInfo __instance, int money)
     {
-        if (__instance.GetName() == "我" && __instance.iOrder == 0)
+        if (__instance.GetName() == "我" && __instance.iOrder == 0 && Assistantbuttonflag == true && money < 0)
         {
-            if (Moneybuttonflag == true)
-            {
-                // 锁定金钱
-                if (int.TryParse(MoneystringArray, out int Moneys))
-                {
-                    __instance.iNowMoney = Moneys;
-                }
-                Moneybuttonflag = false;
-            }
-            else if (Assistantbuttonflag == true)
-            {
-                money = 0;
-            }
             return false;
         }
-        else if (__instance.iOrder == 1)
+        else if (__instance.GetName() == "我" && __instance.iOrder == 1 && Assistantbuttonflag == true && money < 0)
         {
-            if (Moneybuttonflag == true)
-            {
-                // 锁定金钱
-                if (int.TryParse(MoneystringArray, out int Moneys))
-                {
-                    __instance.iNowMoney = Moneys;
-                }
-                Moneybuttonflag = false;
-            }
-            else if (Assistantbuttonflag == true)
-            {
-                money = 0;
-            }
             return false;
         }
         return true;
+    }
+    [HarmonyPostfix, HarmonyPatch(typeof(BattleBaseInfo), "ChangeMoney2")]
+    public static void BattleBaseInfo_ChangeMoney2Postfix(ref BattleBaseInfo __instance)
+    {
+        if (__instance.GetName() == "我" && __instance.iOrder == 0 && Moneybuttonflag == true)
+        {
+            __instance.iNowMoney = int.Parse(MoneystringArray);
+            Moneybuttonflag = false;
+        }
+        else if (__instance.GetName() == "我" && __instance.iOrder == 1 && Moneybuttonflag == true)
+        {
+            __instance.iNowMoney = int.Parse(MoneystringArray);
+            Moneybuttonflag = false;
+        }
     }
 }
