@@ -33,7 +33,7 @@
     </Reference>
   </ItemGroup>
   <!-- 生成的位置 -->
-  <!-- <PropertyGroup>
+  <PropertyGroup>
     <OutputPath>D:\SteamLibrary\steamapps\common\Richman11\BepInEx\plugins</OutputPath>
-  </PropertyGroup> -->
+  </PropertyGroup>
 </Project>
