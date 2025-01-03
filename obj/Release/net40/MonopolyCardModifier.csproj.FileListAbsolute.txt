@@ -1,0 +1,12 @@
+D:\SteamLibrary\steamapps\common\Richman11\BepInEx\plugins\net40\MonopolyCardModifier.dll
+D:\SteamLibrary\steamapps\common\Richman11\BepInEx\plugins\net40\MonopolyCardModifier.pdb
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.csproj.AssemblyReference.cache
+d:\Richman11-Mod\obj\Release\net40\MyPluginInfo.cs
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.GeneratedMSBuildEditorConfig.editorconfig
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.AssemblyInfoInputs.cache
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.AssemblyInfo.cs
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.csproj.CoreCompileInputs.cache
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.sourcelink.json
+D:\Richman11-Mod\obj\Release\net40\Monopoly.A6652A03.Up2Date
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.dll
+d:\Richman11-Mod\obj\Release\net40\MonopolyCardModifier.pdb
