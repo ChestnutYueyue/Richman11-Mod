@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using System.Linq;
 using System;
+using Rich10.Platform.Ddp;
 
 namespace MonopolyCardModifier
 {
@@ -43,6 +44,8 @@ namespace MonopolyCardModifier
         // 字符串存储
         public static string cardIds = "7,1,35,40,43,45,42,26";
         public static string moneyValue = "999999";
+        public static string playerName; // 新增玩家名称字段
+        public static string playerSelf;
         private static StringBuilder stringBuilder = new();
 
         // 初始设置
@@ -51,12 +54,12 @@ namespace MonopolyCardModifier
             // 设置实例和日志记录器
             instance = this;
             logger = Logger;
-
             toggleKey = Config.Bind("General", "Toggle Key", KeyCode.F1, "切换窗口的键");
             toggleLogKey = Config.Bind("General", "Toggle Log Key", KeyCode.F2, "切换日志显示的键");
-
             Harmony.CreateAndPatchAll(typeof(CardTexPlugin));  // 初始化 Harmony 补丁
-            LogMessage($"当前时间:{DateTime.Now.ToString("HH:mm:ss")} 插件加载成功！");
+            playerName = GameEntry.Platform.Instance.GetName();
+            LogMessage($"当前时间:{DateTime.Now.ToString("HH:mm:ss")} Monopoly Card Modifier插件加载成功！");
+
         }
 
         void Update()
@@ -76,9 +79,14 @@ namespace MonopolyCardModifier
             }
 
             // 获取卡牌信息
-            if (uLoading.Instance.iShowStep >= 10 && string.IsNullOrEmpty(stringBuilder.ToString()))
+            if (uLoading.Instance.iShowStep >= 20 && string.IsNullOrEmpty(stringBuilder.ToString()))
             {
+
                 GetCardTex();
+            }
+            if (string.IsNullOrEmpty(playerSelf))
+            {
+                playerSelf = DataManager.Instance.GetText(165);
             }
         }
 
@@ -107,25 +115,29 @@ namespace MonopolyCardModifier
         // 自定义窗口内容
         public void MyWindow(int windowID)
         {
-
-            GUI.skin.box.fontSize = 16;
-            GUILayout.Label("提示: F1 切换菜单显示\n当前已经支持了挑战模式修改。", GUI.skin.box);
-
             // 渲染各个功能
-            RenderCardInput();
-            RenderMoneyInput();
-            RenderFreeConsumptionToggle();
-            RenderCardInfoDisplay();
-
-            // 渲染日志显示开关
+            RenderTitle(); // 渲染标题框
+            RenderPlayerName(); // 渲染玩家名称框
+            RenderCardInput();       // 渲染卡牌ID输入框
+            RenderMoneyInput();      // 渲染玩家金钱输入框
+            RenderFreeConsumptionToggle(); // 渲染消费免费开关
+            RenderCardInfoDisplay();       // 渲染卡牌信息显示
+            RenderLog(); // 渲染日志框
+            GUI.DragWindow();
+        }
+        private void RenderLog()
+        {
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(showLogWindow ? "隐藏日志" : "显示日志"))
             {
                 showLogWindow = !showLogWindow;
             }
             GUILayout.EndHorizontal();
-
-            GUI.DragWindow();
+        }
+        private void RenderTitle()
+        {
+            GUI.skin.box.fontSize = 16;
+            GUILayout.Label("提示: F1 切换菜单显示\n当前MOD支持了单机、联机、挑战模式修改", GUI.skin.box);
         }
 
         // 日志窗口拖动
@@ -148,6 +160,14 @@ namespace MonopolyCardModifier
 
             GUILayout.EndVertical();
             GUI.DragWindow();
+        }
+        // 渲染玩家名称输入框
+        private void RenderPlayerName()
+        {
+            GUILayout.BeginHorizontal(GUI.skin.box);
+            GUILayout.Label($"玩家Steam名称: {playerName}");
+            GUILayout.Label($"玩家单机名称: {playerSelf}");
+            GUILayout.EndHorizontal();
         }
         // 渲染卡牌ID输入框
         private void RenderCardInput()
@@ -224,6 +244,7 @@ namespace MonopolyCardModifier
         {
             LogMessage($"当前时间:{DateTime.Now.ToString("HH:mm:ss")} 开始获取卡牌信息...");
             var cardTex = Traverse.Create(typeof(DataManager)).Field("baseCard").GetValue<BaseCardMgr>();
+
             if (cardTex != null)
             {
                 foreach (var key in cardTex.card.Keys)
@@ -295,7 +316,7 @@ namespace MonopolyCardModifier
         // 判断是否是玩家卡片锁定
         private static bool IsPlayerCardLocked(BattleBaseInfo __instance)
         {
-            return __instance.GetName() == "我" && buttonFlag && (__instance.iOrder == 0 || __instance.iOrder == 1);
+            return (__instance.GetName() == playerName || __instance.GetName() == playerSelf) && buttonFlag;
         }
 
         // 修改金钱时的前置处理，防止银行操作中错误扣除金钱
@@ -304,7 +325,7 @@ namespace MonopolyCardModifier
         {
             if (money == 0 || !__instance.IsActive(false) || !IsPlayerFreeConsumption(__instance) || money >= 0)
             {
-                LogMessage($"当前时间:{DateTime.Now.ToString("HH:mm:ss")} 玩家 '{__instance.GetName()}' 未启用了免费消费，扣除金钱（金额：{money}）");
+                LogMessage($"当前时间:{DateTime.Now.ToString("HH:mm:ss")} 玩家 '{__instance.GetName()}' 未启用了免费消费，（金额：{money}）");
                 return true;
             }
             LogMessage($"当前时间:{DateTime.Now.ToString("HH:mm:ss")} 玩家 '{__instance.GetName()}' 启用了免费消费，阻止了扣除金钱操作（金额：{money}）");
@@ -326,7 +347,7 @@ namespace MonopolyCardModifier
         // 判断玩家是否开启了免费消费功能
         private static bool IsPlayerFreeConsumption(BattleBaseInfo __instance)
         {
-            return __instance.GetName() == "我" && assistantButtonFlag && (__instance.iOrder == 0 || __instance.iOrder == 1);
+            return (__instance.GetName() == playerName || __instance.GetName() == playerSelf) && assistantButtonFlag;
         }
 
 
@@ -345,7 +366,8 @@ namespace MonopolyCardModifier
         // 判断是否需要修改玩家金钱
         private static bool IsPlayerMoneyModified(BattleBaseInfo __instance)
         {
-            return __instance.GetName() == "我" && moneyButtonFlag && (__instance.iOrder == 0 || __instance.iOrder == 1);
+            return (__instance.GetName() == playerName || __instance.GetName() == playerSelf) && moneyButtonFlag;
         }
+
     }
 }

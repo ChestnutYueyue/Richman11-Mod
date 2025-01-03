@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "dgSpecHash": "0ujBgvMPU74=",
+  "success": true,
+  "projectFilePath": "D:\\Richman11-Mod\\MonopolyCardModifier.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\bepinex.analyzers\\1.0.8\\bepinex.analyzers.1.0.8.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\bepinex.baselib\\5.4.20\\bepinex.baselib.5.4.20.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\bepinex.core\\5.4.21\\bepinex.core.5.4.21.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\bepinex.plugininfoprops\\2.1.0\\bepinex.plugininfoprops.2.1.0.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\harmonyx\\2.13.0\\harmonyx.2.13.0.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.2\\microsoft.netframework.referenceassemblies.1.0.2.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net40\\1.0.2\\microsoft.netframework.referenceassemblies.net40.1.0.2.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\mono.cecil\\0.10.4\\mono.cecil.0.10.4.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\monomod.backports\\1.1.2\\monomod.backports.1.1.2.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\monomod.core\\1.1.2\\monomod.core.1.1.2.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\monomod.ilhelpers\\1.1.0\\monomod.ilhelpers.1.1.0.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\monomod.runtimedetour\\25.1.2\\monomod.runtimedetour.25.1.2.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\monomod.utils\\25.0.6\\monomod.utils.25.0.6.nupkg.sha512",
+    "C:\\Users\\RiCoCoSoul\\.nuget\\packages\\unityengine.modules\\5.6.0\\unityengine.modules.5.6.0.nupkg.sha512"
+  ],
+  "logs": []
+}
